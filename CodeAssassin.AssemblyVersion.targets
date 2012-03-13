@@ -3,11 +3,13 @@
   <!-- Example usage: msbuild someproject.csproj /p:AssemblyVersion=1.2.3.4 /p:AssemblyFileVersion=2.3.4.5 /p:AssemblyInformationVersion="Codename Frank" -->
 
   <Target Name="OverrideAssemblyVersion"
-          DependsOnTargets="CoreOverrideAssemblyVersion"
-          BeforeTargets="CoreCompile" />
+          BeforeTargets="CoreCompile">
+    <!-- CallTarget technique used to allow version properties to be set by another target -->
+    <CallTarget Targets="CoreOverrideAssemblyVersion"
+                Condition=" '$(AssemblyVersion)'!='' or '$(AssemblyFileVersion)'!='' or '$(AssemblyInformationalVersion)'!='' " />
+  </Target>
 
-  <Target Name="CoreOverrideAssemblyVersion"
-          Condition=" '$(AssemblyVersion)'!='' or '$(AssemblyFileVersion)'!='' or '$(AssemblyInformationalVersion)'!='' " >
+  <Target Name="CoreOverrideAssemblyVersion">
 
     <PropertyGroup>
       <AssemblyInfoRelativePath>Properties\AssemblyInfo.cs</AssemblyInfoRelativePath>
