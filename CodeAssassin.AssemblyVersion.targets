@@ -3,11 +3,10 @@
   <!-- Example usage: msbuild someproject.csproj /p:AssemblyVersion=1.2.3.4 -->
 
   <Target Name="OverrideAssemblyVersion"
-          BeforeTargets="CoreCompile">
-    <CallTarget Condition="'$(AssemblyVersion)'!=''" Targets="CoreOverrideAssemblyVersion" />
-  </Target>
+          DependsOnTargets="CoreOverrideAssemblyVersion"
+          BeforeTargets="CoreCompile" />
 
-  <Target Name="CoreOverrideAssemblyVersion">
+  <Target Name="CoreOverrideAssemblyVersion" Condition="'$(AssemblyVersion)'!=''" >
 
     <PropertyGroup>
       <AssemblyInfoRelativePath>Properties\AssemblyInfo.cs</AssemblyInfoRelativePath>
