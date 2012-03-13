@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{375602A1-2C4D-4BFE-A44C-E72E03EA3E10}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5BD9F35D-6912-4964-BEB8-4681D9A588BF}"
+	ProjectSection(SolutionItems) = preProject
+		..\CodeAssassin.AssemblyVersion.targets = ..\CodeAssassin.AssemblyVersion.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{375602A1-2C4D-4BFE-A44C-E72E03EA3E10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{375602A1-2C4D-4BFE-A44C-E72E03EA3E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{375602A1-2C4D-4BFE-A44C-E72E03EA3E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{375602A1-2C4D-4BFE-A44C-E72E03EA3E10}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
