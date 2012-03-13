@@ -6,26 +6,29 @@
           DependsOnTargets="CoreOverrideAssemblyVersion"
           BeforeTargets="CoreCompile" />
 
-  <Target Name="CoreOverrideAssemblyVersion" Condition="'$(AssemblyVersion)'!=''" >
+  <Target Name="CoreOverrideAssemblyVersion" Condition="'$(AssemblyVersion)'!='' or '$(AssemblyFileVersion)'!=''" >
 
     <PropertyGroup>
       <AssemblyInfoRelativePath>Properties\AssemblyInfo.cs</AssemblyInfoRelativePath>
     </PropertyGroup>
 
-    <Error Condition="'$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;$(AssemblyVersion)&quot;,&quot;^\d+\.\d+\.\d+\.\d+$&quot;))' == false"
+    <Error Condition="'$(AssemblyVersion)'!='' and '$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;$(AssemblyVersion)&quot;,&quot;^\d+\.\d+\.\d+\.\d+$&quot;))' == false"
            Text="AssemblyVersion must be of the form 'n.n.n.n' where 'n' is a positive integer."/>
 
-    <Message Text="Setting assembly version to '$(AssemblyVersion)'" />
+    <Message Text="Setting assembly version to '$(AssemblyVersion)'" Condition="'$(AssemblyVersion)'!=''"/>
+    <Message Text="Setting assembly file version to '$(AssemblyFileVersion)'" Condition="'$(AssemblyFileVersion)'!=''"/>
 
     <ReadLinesFromFile File="$(AssemblyInfoRelativePath)">
       <Output TaskParameter="Lines" ItemName="AssemblyInfoLines" />
     </ReadLinesFromFile>
 
     <ItemGroup>
-      <NewAssemblyInfoLines Include="@(AssemblyInfoLines)" Condition="'$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;%(Identity)&quot;,&quot;(?i)Assembly(File)?Version&quot;))' == false" />
+      <_AssemblyInfoLines_Pass1 Include="@(AssemblyInfoLines)" Condition="'$(AssemblyVersion)'=='' or '$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;%(Identity)&quot;,&quot;(?i)AssemblyVersion&quot;))' == false" />
+      <_AssemblyInfoLines_Pass2 Include="@(_AssemblyInfoLines_Pass1)" Condition="'$(AssemblyFileVersion)'=='' or '$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;%(Identity)&quot;,&quot;(?i)AssemblyFileVersion&quot;))' == false" />
 
-      <NewAssemblyInfoLines Include="[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)]" />
-      <NewAssemblyInfoLines Include="[assembly: AssemblyFileVersion(&quot;$(AssemblyVersion)&quot;)]" />
+      <NewAssemblyInfoLines Include="@(_AssemblyInfoLines_Pass2)" />
+      <NewAssemblyInfoLines Include="[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)]" Condition="'$(AssemblyVersion)'!=''" />
+      <NewAssemblyInfoLines Include="[assembly: AssemblyFileVersion(&quot;$(AssemblyFileVersion)&quot;)]" Condition="'$(AssemblyFileVersion)'!=''" />
     </ItemGroup>
 
     <WriteLinesToFile File="$(AssemblyInfoRelativePath).versioned.cs"
@@ -35,6 +38,7 @@
     <ItemGroup>
       <Compile Remove="$(AssemblyInfoRelativePath)" />
       <Compile Include="$(AssemblyInfoRelativePath).versioned.cs" />
+      <FileWrites Include="$(AssemblyInfoRelativePath).versioned.cs" />
     </ItemGroup>
 
   </Target>
