@@ -1,22 +1,24 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- Example usage: msbuild someproject.csproj /p:AssemblyVersion=1.2.3.4 -->
+  <!-- Example usage: msbuild someproject.csproj /p:AssemblyVersion=1.2.3.4 /p:AssemblyFileVersion=2.3.4.5 /p:AssemblyInformationVersion="Codename Frank" -->
 
   <Target Name="OverrideAssemblyVersion"
           DependsOnTargets="CoreOverrideAssemblyVersion"
           BeforeTargets="CoreCompile" />
 
-  <Target Name="CoreOverrideAssemblyVersion" Condition="'$(AssemblyVersion)'!='' or '$(AssemblyFileVersion)'!=''" >
+  <Target Name="CoreOverrideAssemblyVersion"
+          Condition=" '$(AssemblyVersion)'!='' or '$(AssemblyFileVersion)'!='' or '$(AssemblyInformationalVersion)'!='' " >
 
     <PropertyGroup>
       <AssemblyInfoRelativePath>Properties\AssemblyInfo.cs</AssemblyInfoRelativePath>
     </PropertyGroup>
 
     <Error Condition="'$(AssemblyVersion)'!='' and '$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;$(AssemblyVersion)&quot;,&quot;^\d+\.\d+\.\d+\.\d+$&quot;))' == false"
-           Text="AssemblyVersion must be of the form 'n.n.n.n' where 'n' is a positive integer."/>
+           Text="AssemblyVersion '$(AssemblyVersion)' must be of the form 'n.n.n.n' where 'n' is a positive integer."/>
 
     <Message Text="Setting assembly version to '$(AssemblyVersion)'" Condition="'$(AssemblyVersion)'!=''"/>
     <Message Text="Setting assembly file version to '$(AssemblyFileVersion)'" Condition="'$(AssemblyFileVersion)'!=''"/>
+    <Message Text="Setting assembly informational version to '$(AssemblyInformationalVersion)'" Condition="'$(AssemblyInformationalVersion)'!=''"/>
 
     <ReadLinesFromFile File="$(AssemblyInfoRelativePath)">
       <Output TaskParameter="Lines" ItemName="AssemblyInfoLines" />
@@ -25,10 +27,12 @@
     <ItemGroup>
       <_AssemblyInfoLines_Pass1 Include="@(AssemblyInfoLines)" Condition="'$(AssemblyVersion)'=='' or '$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;%(Identity)&quot;,&quot;(?i)AssemblyVersion&quot;))' == false" />
       <_AssemblyInfoLines_Pass2 Include="@(_AssemblyInfoLines_Pass1)" Condition="'$(AssemblyFileVersion)'=='' or '$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;%(Identity)&quot;,&quot;(?i)AssemblyFileVersion&quot;))' == false" />
+      <_AssemblyInfoLines_Pass3 Include="@(_AssemblyInfoLines_Pass2)" Condition="'$(AssemblyInformationalVersion)'=='' or '$([System.Text.RegularExpressions.Regex]::IsMatch(&quot;%(Identity)&quot;,&quot;(?i)AssemblyInformationalVersion&quot;))' == false" />
 
-      <NewAssemblyInfoLines Include="@(_AssemblyInfoLines_Pass2)" />
+      <NewAssemblyInfoLines Include="@(_AssemblyInfoLines_Pass3)" />
       <NewAssemblyInfoLines Include="[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)]" Condition="'$(AssemblyVersion)'!=''" />
       <NewAssemblyInfoLines Include="[assembly: AssemblyFileVersion(&quot;$(AssemblyFileVersion)&quot;)]" Condition="'$(AssemblyFileVersion)'!=''" />
+      <NewAssemblyInfoLines Include="[assembly: AssemblyInformationalVersion(&quot;$(AssemblyInformationalVersion)&quot;)]" Condition="'$(AssemblyInformationalVersion)'!=''" />
     </ItemGroup>
 
     <WriteLinesToFile File="$(AssemblyInfoRelativePath).versioned.cs"
